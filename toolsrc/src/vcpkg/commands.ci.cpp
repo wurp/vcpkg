@@ -183,11 +183,12 @@ namespace vcpkg::Commands::CI
             std::string traits_block;
             if (test.abi_tag != "") // only adding if there is a known abi tag
             {
-                traits_block = Strings::format(R"(<traits><trait name="abi_tag" value="%s"></trait></traits>)", test.abi_tag);
+                traits_block = Strings::format(R"(<traits><trait name="abi_tag" value="%s" /></traits>)", test.abi_tag);
             }
 
-            m_xml += Strings::format(R"(      <test name="%s" time="%lld" result="%s">%s%s</test>)"
+            m_xml += Strings::format(R"(      <test name="%s" method="%s" time="%lld" result="%s">%s%s</test>)"
                 "\n",
+                test.name,
                 test.name,
                 test.time.as<std::chrono::seconds>().count(),
                 result_string,
