@@ -719,7 +719,7 @@ namespace vcpkg::Install
         return nullptr;
     }
 
-    std::string InstallSummary::xunit_result(const PackageSpec& spec, Chrono::ElapsedTime time, BuildResult code, std::string abi_tag)
+    static std::string xunit_result(const PackageSpec& spec, Chrono::ElapsedTime time, BuildResult code)
     {
         std::string message_block;
         const char* result_string = "";
@@ -740,19 +740,12 @@ namespace vcpkg::Install
             default: Checks::exit_fail(VCPKG_LINE_INFO);
         }
 
-        std::string traits_block;
-        if (abi_tag != "") // only adding if there is a known abi tag
-        {
-            traits_block = Strings::format(R"(<traits><trait name="abi_tag" value="%s"></trait></traits>)", abi_tag);
-        }
-
-        return Strings::format(R"(<test name="%s" method="%s" time="%lld" result="%s">%s%s</test>)"
+        return Strings::format(R"(<test name="%s" method="%s" time="%lld" result="%s">%s</test>)"
                                "\n",
                                spec,
                                spec,
                                time.as<std::chrono::seconds>().count(),
                                result_string,
-                               traits_block,
                                message_block);
     }
 

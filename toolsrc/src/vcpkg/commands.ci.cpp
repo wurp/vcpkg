@@ -52,6 +52,157 @@ namespace vcpkg::Commands::CI
         nullptr,
     };
 
+    struct XunitTestResults
+    {
+    public:
+
+        XunitTestResults()
+        {
+            m_assembly_run_datetime = Chrono::CTime::get_current_date_time();
+        }
+
+        void add_test_results(const std::string& spec, const Build::BuildResult& build_result, const Chrono::ElapsedTime& elapsed_time, const std::string& abi_tag)
+        {
+            m_collections.back().tests.push_back({ spec, build_result, elapsed_time, abi_tag });
+        }
+
+        // Starting a new test collection
+        void push_collection( const std::string& name)
+        {
+            m_collections.push_back({name});
+        }
+
+        void collection_time(const vcpkg::Chrono::ElapsedTime& time)
+        {
+            m_collections.back().time = time;
+        }
+
+        const std::string& build_xml()
+        {
+            m_xml.clear();
+            xml_start_assembly();
+
+            for (const auto& collection : m_collections)
+            {
+                xml_start_collection(collection);
+                for (const auto& test : collection.tests)
+                {
+                    xml_test(test);
+                }
+                xml_finish_collection();
+            }
+
+            xml_finish_assembly();
+            return m_xml;
+        }
+
+        void assembly_time(const vcpkg::Chrono::ElapsedTime& assembly_time)
+        {
+            m_assembly_time = assembly_time;
+        }
+
+    private:
+
+        struct XunitTest
+        {
+            std::string name;
+            vcpkg::Build::BuildResult result;
+            vcpkg::Chrono::ElapsedTime time;
+            std::string abi_tag;
+        };
+
+        struct XunitCollection
+        {
+            std::string name;
+            vcpkg::Chrono::ElapsedTime time;
+            std::vector<XunitTest> tests;
+        };
+
+        void xml_start_assembly()
+        {
+            std::string datetime;
+            if (m_assembly_run_datetime)
+            {
+                auto rawDateTime = m_assembly_run_datetime.get()->to_string();
+                // The expected format is "yyyy-mm-ddThh:mm:ss.0Z"
+                //                         0123456789012345678901
+                datetime = Strings::format(R"(run-date="%s" run-time="%s")",
+                    rawDateTime.substr(0, 10), rawDateTime.substr(11, 8));
+            }
+
+            std::string time = Strings::format(R"(time="%lld")", m_assembly_time.as<std::chrono::seconds>().count());
+
+            m_xml += Strings::format(
+                R"(<assemblies>)" "\n"
+                R"(  <assembly name="vcpkg" %s %s>)"  "\n"
+                , datetime, time);
+        }
+        void xml_finish_assembly()
+        {
+            m_xml += "  </assembly>\n"
+                "</assemblies>\n";
+        }
+
+        void xml_start_collection(const XunitCollection& collection)
+        {
+            m_xml += Strings::format(R"(    <collection name="%s" time="%lld">)"
+                "\n",
+                collection.name,
+                collection.time.as<std::chrono::seconds>().count());
+        }
+        void xml_finish_collection()
+        {
+            m_xml += "    </collection>\n";
+        }
+
+        void xml_test(const XunitTest& test)
+        {
+            std::string message_block;
+            const char* result_string = "";
+            switch (test.result)
+            {
+            case BuildResult::POST_BUILD_CHECKS_FAILED:
+            case BuildResult::FILE_CONFLICTS:
+            case BuildResult::BUILD_FAILED:
+                result_string = "Fail";
+                message_block = Strings::format("<failure><message><![CDATA[%s]]></message></failure>", to_string(test.result));
+                break;
+            case BuildResult::EXCLUDED:
+            case BuildResult::CASCADED_DUE_TO_MISSING_DEPENDENCIES:
+                result_string = "Skip";
+                message_block = Strings::format("<reason><![CDATA[%s]]></reason>", to_string(test.result));
+                break;
+            case BuildResult::SUCCEEDED:
+                result_string = "Pass";
+                break;
+            default:
+                Checks::exit_fail(VCPKG_LINE_INFO);
+                break;
+            }
+
+            std::string traits_block;
+            if (test.abi_tag != "") // only adding if there is a known abi tag
+            {
+                traits_block = Strings::format(R"(<traits><trait name="abi_tag" value="%s"></trait></traits>)", test.abi_tag);
+            }
+
+            m_xml += Strings::format(R"(      <test name="%s" time="%lld" result="%s">%s%s</test>)"
+                "\n",
+                test.name,
+                test.time.as<std::chrono::seconds>().count(),
+                result_string,
+                traits_block,
+                message_block);
+        }
+
+        Optional<vcpkg::Chrono::CTime> m_assembly_run_datetime;
+        vcpkg::Chrono::ElapsedTime m_assembly_time;
+        std::vector<XunitCollection> m_collections;
+
+        std::string m_xml;
+    };
+
+
     struct UnknownCIPortsResults
     {
         std::vector<FullPackageSpec> unknown;
@@ -231,12 +382,16 @@ namespace vcpkg::Commands::CI
         std::vector<std::map<PackageSpec, BuildResult>> all_known_results;
         std::map<PackageSpec, std::string> abi_tag_map;
 
+        XunitTestResults xunitTestResults;
+
         std::vector<std::string> all_ports = Install::get_all_port_names(paths);
         std::vector<TripletAndSummary> results;
         auto timer = Chrono::ElapsedTimer::create_started();
         for (const Triplet& triplet : triplets)
         {
             Input::check_triplet(triplet, paths);
+
+            xunitTestResults.push_collection(triplet.canonical_name());
 
             Dependencies::PackageGraph pgraph(paths_port_file, status_db);
 
@@ -306,18 +461,32 @@ namespace vcpkg::Commands::CI
             }
             else
             {
+                auto collection_timer = Chrono::ElapsedTimer::create_started();
                 auto summary = Install::perform(action_plan, Install::KeepGoing::YES, paths, status_db);
+                auto collection_time_elapsed = collection_timer.elapsed();
 
+                // Adding results for ports that were built or pulled from an archive
                 for (auto&& result : summary.results)
+                {
                     split_specs->known.erase(result.spec);
+                    xunitTestResults.add_test_results(result.spec.to_string(), result.build_result.code, result.timing, split_specs->abi_tag_map.at(result.spec));
+                }
+
+                // Adding results for ports that were not built because they have known states
+                for (auto&& port : split_specs->known)
+                {
+                    xunitTestResults.add_test_results(port.first.to_string(), port.second, Chrono::ElapsedTime{}, split_specs->abi_tag_map.at(port.first));
+                }
 
                 all_known_results.emplace_back(std::move(split_specs->known));
                 abi_tag_map.insert(split_specs->abi_tag_map.begin(), split_specs->abi_tag_map.end());
 
                 results.push_back({ triplet, std::move(summary)});
+
+                xunitTestResults.collection_time( collection_time_elapsed );
             }
         }
-        auto total_test_time = timer.elapsed();
+        xunitTestResults.assembly_time(timer.elapsed());
 
         for (auto&& result : results)
         {
@@ -329,31 +498,7 @@ namespace vcpkg::Commands::CI
         auto it_xunit = options.settings.find(OPTION_XUNIT);
         if (it_xunit != options.settings.end())
         {
-            std::string xunit_doc = Strings::format(R"(<assemblies><assembly time="%lld"><collection>\n)",
-                total_test_time.as<std::chrono::seconds>().count());
-
-            // The contents of 'results' are the ports that were actually built (or attempted to build)
-            for (auto&& result : results)
-            {
-                for (auto&& port_result : result.summary.results)
-                {
-                    const std::string& abi = abi_tag_map.at(port_result.spec);
-                    xunit_doc += Install::InstallSummary::xunit_result(port_result.spec, port_result.timing, port_result.build_result.code, abi);
-                }
-            }
-
-            // The contents of 'all_known_results' are ports that have a previously known build state, so they were not actually built.
-            for (auto&& known_result : all_known_results)
-            {
-                for (auto&& port_result : known_result)
-                {
-                    const std::string& abi = abi_tag_map.at(port_result.first);
-                    xunit_doc += Install::InstallSummary::xunit_result(port_result.first, Chrono::ElapsedTime {}, port_result.second, abi);
-                }
-            }
-
-            xunit_doc += "</collection></assembly></assemblies>\n";
-            paths.get_filesystem().write_contents(fs::u8path(it_xunit->second), xunit_doc);
+            paths.get_filesystem().write_contents(fs::u8path(it_xunit->second), xunitTestResults.build_xml());
         }
 
         Checks::exit_success(VCPKG_LINE_INFO);
