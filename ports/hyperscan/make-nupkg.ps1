@@ -1,3 +1,6 @@
+rd buildtrees\python3
+rd buildtrees\boost*
+
 md custom-nupkg\installed\x64-windows-static\debug\lib
 md custom-nupkg\installed\x64-windows-static\lib
 md custom-nupkg\installed\x64-windows-static\include\hs
@@ -13,4 +16,5 @@ cp ports\hyperscan\hyperscan-5.1.0.nuspec custom-nupkg
 cd custom-nupkg
 Compress-Archive -Path * -DestinationPath ..\hyperscan-5.1.0.zip
 cd ..
+sleep 60
 move hyperscan-5.1.0.zip hyperscan-5.1.0.nupkg
