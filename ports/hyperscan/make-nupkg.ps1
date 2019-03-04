@@ -1,11 +1,15 @@
+echo Starting make-nupkg
 rd buildtrees\python3
+echo Deleted python3
 rd buildtrees\boost-core
+echo Deleted boost-core
 
 md custom-nupkg\installed\x64-windows-static\debug\lib
 md custom-nupkg\installed\x64-windows-static\lib
 md custom-nupkg\installed\x64-windows-static\include\hs
 md custom-nupkg\_rels
 
+echo copying hs.lib
 cp buildtrees\hyperscan\x64-windows-static-dbg\lib\hs.lib custom-nupkg\installed\x64-windows-static\debug\lib
 cp buildtrees\hyperscan\x64-windows-static-rel\lib\hs.lib custom-nupkg\installed\x64-windows-static\lib
 cp buildtrees\hyperscan\src\*\src\*.h custom-nupkg\installed\x64-windows-static\include\hs
