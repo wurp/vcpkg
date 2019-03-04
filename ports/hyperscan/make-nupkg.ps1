@@ -1,5 +1,5 @@
 rd buildtrees\python3
-rd buildtrees\boost*
+rd buildtrees\boost-core
 
 md custom-nupkg\installed\x64-windows-static\debug\lib
 md custom-nupkg\installed\x64-windows-static\lib
