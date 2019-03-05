@@ -27,4 +27,4 @@ cd custom-nupkg
 Compress-Archive -Path * -DestinationPath ..\hyperscan-5.1.0.zip
 cd ..
 sleep 60
-move hyperscan-5.1.0.zip hyperscan-5.1.0.nupkg
+move hyperscan-5.1.0.zip hyperscan-5-1-0.1.0.0.nupkg
