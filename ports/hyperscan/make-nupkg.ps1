@@ -1,7 +1,7 @@
 echo Starting make-nupkg
-rd buildtrees\python3
+rd -Recurse buildtrees\python3
 echo Deleted python3
-rd buildtrees\boost-core
+rd -Recurse buildtrees\boost-core
 echo Deleted boost-core
 
 md custom-nupkg\installed\x64-windows-static\debug\lib
