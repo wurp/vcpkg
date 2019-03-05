@@ -1,8 +1,14 @@
-echo Starting make-nupkg
+echo "Starting make-nupkg"
 rd -Recurse buildtrees\python3
-echo Deleted python3
+echo "Deleted python3"
 rd -Recurse buildtrees\boost-core
-echo Deleted boost-core
+echo "Deleted boost-core"
+rd -Recurse buildtrees\hyperscan\x64-windows-static-dbg\bin
+echo "Deleted hyperscan dbg bin"
+rd -Recurse buildtrees\hyperscan\x64-windows-static-dbg\CMakeFiles
+echo "Deleted hyperscan dbg CMakeFiles"
+rd -Recurse buildtrees\hyperscan\x64-windows-static-dbg\unit
+echo "Deleted hyperscan dbg unit"
 
 md custom-nupkg\installed\x64-windows-static\debug\lib
 md custom-nupkg\installed\x64-windows-static\lib
