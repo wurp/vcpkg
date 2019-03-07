@@ -16,6 +16,12 @@ vcpkg_extract_source_archive_ex(
     ARCHIVE ${ARCHIVE}
     REF ${HYPERSCAN_VERSION})
 
+vcpkg_apply_patches(
+    SOURCE_PATH ${CURRENT_BUILDTREES_DIR}/src/hyperscan
+    PATCHES "${CMAKE_CURRENT_LIST_DIR}/mcclellancompile.patch"
+            "${CMAKE_CURRENT_LIST_DIR}/ue2string.patch"
+)
+
 vcpkg_find_acquire_program(PYTHON3)
 
 # Add python3 to path

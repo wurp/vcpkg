@@ -1,0 +1,26 @@
++--- a/src/util/ue2string.cpp
+++++ b/src/util/ue2string.cpp
+@@ -291,8 +291,22 @@
+     s.push_back(c);
+ }
+ 
++template<class _BidIt> inline
++	void reverse(_BidIt _First, _BidIt _Last)
++	{	// reverse elements in [_First, _Last)
++	_DEBUG_RANGE(_First, _Last);
++	_Reverse(_Unchecked(_First), _Unchecked(_Last), _Iter_cat(_First));
++	}
++
++template<class _BidIt> inline
++	void _Reverse(_BidIt _First, _BidIt _Last, bidirectional_iterator_tag)
++	{	// reverse elements in [_First, _Last), bidirectional iterators
++	for (; _First != _Last && _First != --_Last; ++_First)
++		_STD iter_swap(_First, _Last);
++	}
++
+ void ue2_literal::reverse() {
+-    std::reverse(s.begin(), s.end());
++    reverse(s.begin(), s.end());
+ 
+     const size_t len = nocase.size();
+     for (size_t i = 0; i < len / 2; i++) {

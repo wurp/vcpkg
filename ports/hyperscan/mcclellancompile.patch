@@ -1,0 +1,23 @@
+--- src/nfa/mcclellancompile.cpp
++++ src/nfa/mcclellancompile.cpp
+@@ -1400,6 +1400,20 @@
+     }
+ }
+ 
++template<class _BidIt> inline
++	void reverse(_BidIt _First, _BidIt _Last)
++	{	// reverse elements in [_First, _Last)
++	_DEBUG_RANGE(_First, _Last);
++	_Reverse(_Unchecked(_First), _Unchecked(_Last), _Iter_cat(_First));
++	}
++
++template<class _BidIt> inline
++	void _Reverse(_BidIt _First, _BidIt _Last, bidirectional_iterator_tag)
++	{	// reverse elements in [_First, _Last), bidirectional iterators
++	for (; _First != _Last && _First != --_Last; ++_First)
++		_STD iter_swap(_First, _Last);
++	}
++
+ /* \brief Find potential regions of states to be packed into wide states. */
+ static
+ void find_wide_state(dfa_info &info) {
