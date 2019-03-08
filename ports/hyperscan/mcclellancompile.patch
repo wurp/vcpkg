@@ -1,6 +1,8 @@
---- src/nfa/mcclellancompile.cpp
-+++ src/nfa/mcclellancompile.cpp
-@@ -1400,6 +1400,20 @@
+diff --git a/src/nfa/mcclellancompile.cpp b/src/nfa/mcclellancompile.cpp
+index c1a4f87..360ebf3 100644
+--- a/src/nfa/mcclellancompile.cpp
++++ b/src/nfa/mcclellancompile.cpp
+@@ -1400,6 +1400,20 @@ void generate_symbol_chain(dfa_info &info, vector<symbol_t> &chain_tail) {
      }
  }
  
