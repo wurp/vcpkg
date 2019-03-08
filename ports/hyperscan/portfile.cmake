@@ -17,7 +17,7 @@ vcpkg_extract_source_archive_ex(
     REF ${HYPERSCAN_VERSION})
 
 vcpkg_apply_patches(
-    SOURCE_PATH ${CURRENT_BUILDTREES_DIR}/src/hyperscan
+    SOURCE_PATH ${SOURCE_PATH}
     PATCHES "${CMAKE_CURRENT_LIST_DIR}/mcclellancompile.patch"
             "${CMAKE_CURRENT_LIST_DIR}/ue2string.patch"
 )

@@ -1,26 +1,27 @@
-+--- a/src/util/ue2string.cpp
-++++ b/src/util/ue2string.cpp
-@@ -291,8 +291,22 @@
+diff --git a/src/util/ue2string.cpp b/src/util/ue2string.cpp
+index 98b007d..2da9ef2 100644
+--- a/src/util/ue2string.cpp
++++ b/src/util/ue2string.cpp
+@@ -291,8 +291,21 @@ void ue2_literal::push_back(char c, bool nc) {
      s.push_back(c);
  }
- 
+
 +template<class _BidIt> inline
-+	void reverse(_BidIt _First, _BidIt _Last)
-+	{	// reverse elements in [_First, _Last)
-+	_DEBUG_RANGE(_First, _Last);
-+	_Reverse(_Unchecked(_First), _Unchecked(_Last), _Iter_cat(_First));
-+	}
++       void reverseit(_BidIt _First, _BidIt _Last)
++       {       // reverse elements in [_First, _Last)
++       _Reverseit(_First, _Last);
++       }
 +
 +template<class _BidIt> inline
-+	void _Reverse(_BidIt _First, _BidIt _Last, bidirectional_iterator_tag)
-+	{	// reverse elements in [_First, _Last), bidirectional iterators
-+	for (; _First != _Last && _First != --_Last; ++_First)
-+		_STD iter_swap(_First, _Last);
-+	}
++       void _Reverseit(_BidIt _First, _BidIt _Last)
++       {       // reverse elements in [_First, _Last), bidirectional iterators
++       for (; _First != _Last && _First != --_Last; ++_First)
++               _STD iter_swap(_First, _Last);
++       }
 +
  void ue2_literal::reverse() {
 -    std::reverse(s.begin(), s.end());
-+    reverse(s.begin(), s.end());
- 
++    reverseit(s.begin(), s.end());
+
      const size_t len = nocase.size();
      for (size_t i = 0; i < len / 2; i++) {
