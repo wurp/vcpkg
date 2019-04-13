@@ -146,5 +146,5 @@
   <Default Extension="targets" ContentType="application/octet" />
   <Default Extension="vcpkg-root" ContentType="application/octet" />
   <Default Extension="nuspec" ContentType="application/octet" />
-  <Override PartName="/installed/x64-windows-static/share/hyperscan/copyright" ContentType="application/octet" />
+  <Override PartName="/installed/x64-windows/share/hyperscan/copyright" ContentType="application/octet" />
 </Types>

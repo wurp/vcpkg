@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>hyperscan_5_1_0</id>
-    <version>1.0.2</version>
+    <id>hyperscan_5_1_1</id>
+    <version>1.0.0</version>
     <authors>vcpkg</authors>
     <owners>vcpkg</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
