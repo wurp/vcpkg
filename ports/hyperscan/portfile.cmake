@@ -1,11 +1,10 @@
-# Build with 'vcpkg.exe install hyperscan:x86-windows-static-release'; Hyperscan doesn't support dynamic libraries on Windows.
 include(vcpkg_common_functions)
 
 set(HYPERSCAN_VERSION 5.1.1)
 vcpkg_download_distfile(ARCHIVE
-    URLS "https://github.com/wurp/hyperscan/archive/master.zip"
+    URLS "https://codeload.github.com/wurp/hyperscan/zip/v5.1.1"
     FILENAME "v${HYPERSCAN_VERSION}.zip"
-    SHA512 03123662630af0311100aa7b13700c6481b96b808f0211084088dfef2f1f11855efe061e5246cc176e86b6b31a0d636b8daebc5bafb1af5544470b4c269785cc
+    SHA512 50b22909613f4ce97a8b5551250f2dd8c1d0492250376ec56d19b6f153a3c46c72d3335f89d86b02c53f09e95d82be131b8ed6862cea9fe7260e1055007d2a94
 )
 
 vcpkg_extract_source_archive_ex(
