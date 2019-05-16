@@ -1,0 +1,64 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 4c8df0b..6169985 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -723,6 +723,7 @@ SET (hs_compile_SRCS
+     src/scratch.h
+     src/state.h
+     src/ue2common.h
++    src/hs_validate.c
+     src/compiler/asserts.cpp
+     src/compiler/asserts.h
+     src/compiler/compiler.cpp
+diff --git a/hs.def b/hs.def
+index 16cedb8..6b18634 100644
+--- a/hs.def
++++ b/hs.def
+@@ -40,4 +40,5 @@ EXPORTS
+    hs_set_stream_allocator
+    hs_stream_size
+    hs_valid_platform
++   hs_validate
+    hs_version
+\ No newline at end of file
+diff --git a/src/hs_validate.c b/src/hs_validate.c
+new file mode 100644
+index 0000000..f5811a1
+--- /dev/null
++++ b/src/hs_validate.c
+@@ -0,0 +1,35 @@
++#include "hs.h"
++#include <string.h>
++
++hs_error_t hs_validate(const char* pattern, unsigned int flags, char* err_msg, int err_msg_buffer_len) {
++    hs_error_t err;
++    hs_compile_error_t *compile_err;
++    hs_database_t *db = NULL;
++
++    err = hs_compile(pattern, flags, HS_MODE_BLOCK, NULL, &db, &compile_err);
++
++    if (err == HS_SUCCESS) {
++        hs_free_database(db);
++    } else {
++        if (err_msg != NULL) {
++            int err_msg_len = strlen(compile_err->message);
++            strncpy(err_msg, compile_err->message, err_msg_buffer_len);
++
++            // guarantee null termination
++            if (err_msg_buffer_len > 0) {
++                err_msg[err_msg_buffer_len - 1] = 0;
++            }
++
++            // if we truncated the message, add ... to indicate it was elided
++            if (err_msg_buffer_len > 3 && err_msg_len > err_msg_buffer_len - 1) {
++                err_msg[err_msg_buffer_len - 2] = '.';
++                err_msg[err_msg_buffer_len - 3] = '.';
++                err_msg[err_msg_buffer_len - 4] = '.';
++            }
++        }
++
++        hs_free_compile_error(compile_err);
++    }
++
++    return err;
++}
