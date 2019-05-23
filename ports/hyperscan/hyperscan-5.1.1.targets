@@ -2,18 +2,20 @@
 <Project ToolVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemDefinitionGroup>
     <Link>
-      <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)..\lib\native\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)build\x64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)..\include\hs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)..\lib\native\hs-mt-x64.dll">
+    <NativeLibs Include="$(MSBuildThisFileDirectory)**\*.dll" />
+    <None Include="@(NativeLibs)">
+      <Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Reference Include="hs-mt-x64">
-      <HintPath>$(MSBuildThisFileDirectory)..\lib\native\hs-mt-x64.dll</HintPath>
+    </None>
+    <Reference Include="hs">
+      <HintPath>$(MSBuildThisFileDirectory)x64\hs.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
