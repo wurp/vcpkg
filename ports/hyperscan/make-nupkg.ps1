@@ -24,11 +24,11 @@ cp buildtrees\hyperscan\x64-windows-rel\lib\hs.lib custom-nupkg\build\x64\hs.lib
 cp buildtrees\hyperscan\src\*\src\*.h custom-nupkg\include\hs
 cp ports\hyperscan\'``[Content_Types``].xml' custom-nupkg
 cp ports\hyperscan\_rels\.rels custom-nupkg\_rels
-cp ports\hyperscan\hyperscan-5.1.1.targets custom-nupkg\build
+cp ports\hyperscan\hyperscan_5_1_1.targets custom-nupkg\build
 cp ports\hyperscan\hyperscan-5.1.1.nuspec custom-nupkg
 
 cd custom-nupkg
 Compress-Archive -Path * -DestinationPath ..\hyperscan-5.1.1.zip
 cd ..
 sleep 60
-move hyperscan-5.1.1.zip hyperscan_5_1_1.1.0.6.nupkg
+move hyperscan-5.1.1.zip hyperscan_5_1_1.1.0.7.nupkg
