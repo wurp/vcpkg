@@ -14,9 +14,7 @@ vcpkg_extract_source_archive_ex(
 
 vcpkg_apply_patches(
     SOURCE_PATH ${SOURCE_PATH}
-    PATCHES "${CMAKE_CURRENT_LIST_DIR}/mcclellancompile.patch"
-            "${CMAKE_CURRENT_LIST_DIR}/ue2string.patch"
-            "${CMAKE_CURRENT_LIST_DIR}/hs_validate.patch"
+    PATCHES "${CMAKE_CURRENT_LIST_DIR}/hs_validate.patch"
 )
 
 vcpkg_find_acquire_program(PYTHON3)
