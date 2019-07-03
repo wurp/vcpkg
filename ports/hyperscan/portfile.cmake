@@ -12,9 +12,25 @@ vcpkg_extract_source_archive_ex(
     ARCHIVE ${ARCHIVE}
     REF ${HYPERSCAN_VERSION})
 
+set(PCRE "pcre")
+vcpkg_download_distfile(PCRE_ARCHIVE
+    URLS "https://ftp.pcre.org/pub/pcre/pcre-8.43.zip"
+    FILENAME "pcre-8.43.zip"
+    SHA512 e64d3b838551216bd7d593a3fed3180ae4098d745f47ee672f76c26f59834d23e415c7930e0d5660f625d4be3baba0702b5784be9ed24087dada1103aa9b8b6c
+)
+
+vcpkg_extract_source_archive_ex(
+    OUT_SOURCE_PATH PCRE_SOURCE_PATH
+    ARCHIVE ${PCRE_ARCHIVE}
+    REF ${PCRE})
+
+file(RENAME ${PCRE_SOURCE_PATH} ${SOURCE_PATH}/pcre)
+file(COPY ports/hyperscan/chimera.def DESTINATION ${SOURCE_PATH}/chimera/)
+
 vcpkg_apply_patches(
     SOURCE_PATH ${SOURCE_PATH}
     PATCHES "${CMAKE_CURRENT_LIST_DIR}/hs_validate.patch"
+            "${CMAKE_CURRENT_LIST_DIR}/chimera.patch"
 )
 
 vcpkg_find_acquire_program(PYTHON3)

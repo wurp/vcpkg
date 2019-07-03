@@ -21,7 +21,12 @@ cp buildtrees\hyperscan\x64-windows-dbg\bin\hs.dll custom-nupkg\build\x64\hs-gd.
 cp buildtrees\hyperscan\x64-windows-rel\bin\hs.dll custom-nupkg\build\x64\hs.dll
 cp buildtrees\hyperscan\x64-windows-dbg\lib\hs.lib custom-nupkg\build\x64\hs-gd.lib
 cp buildtrees\hyperscan\x64-windows-rel\lib\hs.lib custom-nupkg\build\x64\hs.lib
+cp buildtrees\hyperscan\x64-windows-dbg\bin\chimera.dll custom-nupkg\build\x64\chimera-gd.dll
+cp buildtrees\hyperscan\x64-windows-rel\bin\chimera.dll custom-nupkg\build\x64\chimera.dll
+cp buildtrees\hyperscan\x64-windows-dbg\lib\chimera.lib custom-nupkg\build\x64\chimera-gd.lib
+cp buildtrees\hyperscan\x64-windows-rel\lib\chimera.lib custom-nupkg\build\x64\chimera.lib
 cp buildtrees\hyperscan\src\*\src\*.h custom-nupkg\include\hs
+cp buildtrees\hyperscan\src\*\chimera\*.h custom-nupkg\include\hs
 cp ports\hyperscan\'``[Content_Types``].xml' custom-nupkg
 cp ports\hyperscan\_rels\.rels custom-nupkg\_rels
 cp ports\hyperscan\hyperscan_5_1_1.targets custom-nupkg\build

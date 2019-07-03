@@ -1,0 +1,80 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index a37eaa9..934179b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -510,7 +510,7 @@ if (NOT CORRECT_PCRE_VERSION)
+ endif()
+ 
+ # we need static libs for Chimera - too much deep magic for shared libs
+-if (CORRECT_PCRE_VERSION AND PCRE_BUILD_SOURCE AND BUILD_STATIC_LIBS)
++if (CORRECT_PCRE_VERSION AND PCRE_BUILD_SOURCE)
+     set(BUILD_CHIMERA TRUE)
+ endif()
+ 
+diff --git a/chimera/CMakeLists.txt b/chimera/CMakeLists.txt
+index 1cd66a3..cf58f46 100644
+--- a/chimera/CMakeLists.txt
++++ b/chimera/CMakeLists.txt
+@@ -2,6 +2,9 @@
+ 
+ include_directories(${PCRE_INCLUDE_DIRS})
+ 
++option(BUILD_SHARED_LIBS "Build shared libs instead of static" OFF)
++option(BUILD_STATIC_AND_SHARED "Build shared libs as well as static" OFF)
++
+ # only set these after all tests are done
+ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_C_FLAGS}")
+ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_CXX_FLAGS}")
+@@ -27,12 +30,49 @@ SET(chimera_SRCS
+     ch_scratch.c
+ )
+ 
+-add_library(chimera STATIC ${chimera_SRCS})
++if (BUILD_STATIC_AND_SHARED OR BUILD_SHARED_LIBS)
++    if (WIN32)
++        SET(chimera_internal_OBJS
++            ../CMakeFiles/hs_exec_shared.dir/src/util/multibit.c.obj
++            ../CMakeFiles/hs_compile_shared.dir/src/util/multibit_build.cpp.obj
++            ../CMakeFiles/hs_compile_shared.dir/src/util/compile_error.cpp.obj
++            ../pcre/CMakeFiles/pcre.dir/pcre_valid_utf8.c.obj
++            ../pcre/CMakeFiles/pcre.dir/pcre_tables.c.obj
++            ../pcre/CMakeFiles/pcre.dir/pcre_globals.c.obj
++        )
++
++        add_library(chimera SHARED ${chimera_internal_OBJS} ${chimera_SRCS} chimera.def)
++
++        SET_SOURCE_FILES_PROPERTIES(
++          ${chimera_internal_OBJS}
++          PROPERTIES
++          EXTERNAL_OBJECT true
++          GENERATED true
++        )
++    else ()
++        add_library(chimera SHARED ${chimera_SRCS})
++    endif()
++    set_target_properties(chimera PROPERTIES
++        VERSION ${LIB_VERSION}
++        SOVERSION ${LIB_SOVERSION}
++        OUTPUT_NAME chimera
++        MACOSX_RPATH ON
++        LINKER_LANGUAGE C)
++
++    install(TARGETS chimera
++        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
++        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
++endif()
++
++if (BUILD_STATIC_AND_SHARED OR BUILD_STATIC_LIBS)
++    add_library(chimera STATIC ${chimera_SRCS})
++    # TODO install static
++endif()
++
+ add_dependencies(chimera hs pcre)
+ target_link_libraries(chimera hs pcre)
+ 
+-install(TARGETS chimera DESTINATION ${CMAKE_INSTALL_LIBDIR})
+-
+ if (NOT WIN32)
+     # expand out library names for pkgconfig static link info
+     foreach (LIB ${CMAKE_CXX_IMPLICIT_LINK_LIBRARIES})
