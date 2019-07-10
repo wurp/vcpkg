@@ -31,6 +31,7 @@ vcpkg_apply_patches(
     SOURCE_PATH ${SOURCE_PATH}
     PATCHES "${CMAKE_CURRENT_LIST_DIR}/hs_validate.patch"
             "${CMAKE_CURRENT_LIST_DIR}/chimera.patch"
+            "${CMAKE_CURRENT_LIST_DIR}/pcre.patch"
 )
 
 vcpkg_find_acquire_program(PYTHON3)

@@ -1,0 +1,13 @@
+diff --git a/pcre/CMakeLists.txt b/pcre/CMakeLists.txt
+index 1cd66a3..cf58f46 100644
+--- a/pcre/CMakeLists.txt	2019-04-26 11:44:30.000000000 -0700
++++ b/pcre/CMakeLists.txt	2019-07-10 10:35:41.054849100 -0700
+@@ -622,6 +622,7 @@
+ # pcre
+ IF(PCRE_BUILD_PCRE8)
+ ADD_LIBRARY(pcre ${PCRE_HEADERS} ${PCRE_SOURCES} ${PROJECT_BINARY_DIR}/config.h)
++ADD_LIBRARY(pcreobjs OBJECT ${PCRE_HEADERS} ${PCRE_SOURCES} ${PROJECT_BINARY_DIR}/config.h)
+ SET(targets ${targets} pcre)
+ ADD_LIBRARY(pcreposix ${PCREPOSIX_HEADERS} ${PCREPOSIX_SOURCES})
+ SET(targets ${targets} pcreposix)
+

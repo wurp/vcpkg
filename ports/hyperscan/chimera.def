@@ -6,18 +6,17 @@ EXPORTS
    ch_alloc_scratch
    ch_clone_scratch
    ch_compile
+   ch_compile_ext_multi
+   ch_compile_multi
+   ch_database_info
+   ch_database_size
    ch_free_compile_error
    ch_free_database
    ch_free_scratch
    ch_scan
-   ch_database_info
+   ch_scratch_size
    ch_set_allocator
+   ch_set_database_allocator
    ch_set_misc_allocator
    ch_set_scratch_allocator
-   ch_compile_multi
    ch_version
-   ch_database_size
-   ch_compile_ext_multi
-   ch_scratch_size
-   ch_set_database_allocator
-
